@@ -1,7 +1,9 @@
 from turtle import Screen, Turtle
 import time
-from snake import Snake, COORDINATE_LIST
+from snake import Snake
 import random
+from food import Food
+from scoreboard import ScoreBoard
 screen = Screen()
 screen.setup(width=600, height=600)
 screen.bgcolor("black")
@@ -11,22 +13,9 @@ screen.tracer(0)
 snake_controls = Snake()
 snake_controls.make_snake()
 game_on = True
-score = 0
-fruit_list = []
-
-
-def make_fruit():
-    """Making fruit"""
-    random_x = random.choice(COORDINATE_LIST)
-    random_y = random.choice(COORDINATE_LIST)
-    fruit = Turtle("circle")
-    fruit.penup()
-    fruit.color("white")
-    fruit.goto(random_x, random_y)
-    fruit_list.append(fruit)
-    return fruit.position()
-
-
+food = Food()
+score_board = ScoreBoard()
+game_line = score_board.borders()
 for item in snake_controls.snake_body:
     screen.listen()
     screen.onkeypress(fun=snake_controls.turn_right, key="d")
@@ -34,7 +23,6 @@ for item in snake_controls.snake_body:
     screen.onkeypress(fun=snake_controls.move_down, key="s")
     screen.onkeypress(fun=snake_controls.turn_left, key="a")
 
-make_fruit()
 
 while game_on:
     screen.update()
@@ -44,16 +32,21 @@ while game_on:
         new_x = snake_controls.snake_body[seg_num - 1].xcor()
         new_y = snake_controls.snake_body[seg_num - 1].ycor()
         snake_controls.snake_body[seg_num].goto(new_x, new_y)
-    snake_controls.snake_body[0].forward(20)
+    snake_controls.snake_body[0].back(20)
 
-    if snake_controls.snake_body[0].position() == fruit_list[0].position():
-        score += 1
-        fruit_list[0].reset()
-        fruit_list.clear()
-        make_fruit()
-        print(fruit_list)
-        print(fruit_list[0].position())
-        print(score)
+
+    for segment in [x for x in snake_controls.snake_body if x != snake_controls.snake_body[0]]:
+        """maybe change order of segments to solve issue"""
+        if snake_controls.snake_body[0].distance(segment) < 15:
+            game_on = False
+    if snake_controls.snake_body[0].distance(food) < 15:
+        snake_controls.add_segment()
+        score_board.clear()
+        score_board.increase_score()
+        food.refresh()
+    elif snake_controls.snake_body[0].xcor() == -300 or snake_controls.snake_body[0].xcor() == 280 or \
+            snake_controls.snake_body[0].ycor() == 280 or snake_controls.snake_body[0].ycor() == -280:
+        game_on = False
 
 
 screen.exitonclick()

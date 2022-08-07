@@ -1,9 +1,9 @@
-from turtle import Turtle, Screen
-COORDINATE_LIST = [20.00, 40.00, 60.00, 80.00, 100.00, 120.00, 140.00, 160.00, 180.00, 200.00, 220.00, 240.00]
-UP = 90
-DOWN = 270
-RIGHT = 0
-LEFT = 180
+from turtle import Turtle
+
+DOWN = 90
+UP = 270
+LEFT = 0
+RIGHT = 180
 
 
 class Snake:
@@ -11,15 +11,20 @@ class Snake:
         self.snake_body = []
 
     def make_snake(self):
-        starting_x_position = 0
-        for _ in range(3):
+        for coord in [-20.0, 0.0, 20.00]:
             new_turtle = Turtle()
             self.snake_body.append(new_turtle)
             new_turtle.penup()
             new_turtle.color("white")
             new_turtle.shape("square")
-            new_turtle.goto(starting_x_position, 0)
-            starting_x_position += 20
+            new_turtle.goto(coord, 0)
+
+    def add_segment(self):
+        new_segment = Turtle()
+        new_segment.penup()
+        new_segment.color("white")
+        new_segment.shape("square")
+        self.snake_body.append(new_segment)
 
     def move_up(self):
         if self.snake_body[0].heading() != DOWN:
